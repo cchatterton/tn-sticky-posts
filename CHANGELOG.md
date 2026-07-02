@@ -2,6 +2,11 @@
 
 All notable changes to TN Sticky Posts are recorded here.
 
+## 1.0.5 - 2026-07-02
+
+- Fixed slide initialization so announcements remain visible while JavaScript measures the active item height.
+- Delayed animated absolute positioning until after a valid initial layout pass.
+
 ## 1.0.4 - 2026-07-02
 
 - Hardened the plugin-row manual update check so it directly refreshes WordPress update data.

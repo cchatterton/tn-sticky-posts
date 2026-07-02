@@ -1,7 +1,7 @@
 # TN Sticky Posts
 
 Author: Techn
-Version: 1.0.4
+Version: 1.0.5
 Status: MVP
 
 ## Purpose

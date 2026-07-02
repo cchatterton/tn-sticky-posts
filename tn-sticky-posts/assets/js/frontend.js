@@ -11,18 +11,27 @@
         var timer = null;
         var transitionMs = 300;
 
-        root.classList.add('is-initialised');
+        if (!items[current].classList.contains('is-active')) {
+            items[current].classList.add('is-active');
+        }
 
         if (reduceMotion) {
             root.classList.add('is-reduced-motion');
+            root.classList.add('is-initialised');
+            return;
         }
 
-        if (items.length <= 1 || reduceMotion || root.classList.contains('sticky-announcements--none')) {
+        if (items.length <= 1 || root.classList.contains('sticky-announcements--none')) {
+            root.classList.add('is-initialised');
             return;
         }
 
         function updateHeight() {
-            root.style.setProperty('--sticky-announcements-height', items[current].offsetHeight + 'px');
+            var height = items[current].getBoundingClientRect().height || items[current].scrollHeight;
+
+            if (height > 0) {
+                root.style.setProperty('--sticky-announcements-height', height + 'px');
+            }
         }
 
         function show(index) {
@@ -86,7 +95,13 @@
         });
 
         updateHeight();
-        start();
+        root.classList.add('is-initialised');
+
+        window.requestAnimationFrame(function () {
+            updateHeight();
+            root.classList.add('is-ready');
+            start();
+        });
     }
 
     function ready() {
