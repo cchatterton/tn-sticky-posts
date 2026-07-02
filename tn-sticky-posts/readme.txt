@@ -1,12 +1,12 @@
-# Sticky Announcements
+# TN Sticky Posts
 
 Author: Techn
-Version: 1.0.1
+Version: 1.0.2
 Status: MVP
 
 ## Purpose
 
-Sticky Announcements adds centrally managed announcement text and destination URLs to native WordPress sticky posts.
+TN Sticky Posts adds centrally managed announcement text, click labels, and click URLs to native WordPress sticky posts.
 
 ## Key Features
 
@@ -16,6 +16,7 @@ Sticky Announcements adds centrally managed announcement text and destination UR
 - Renders active announcements with the `[sticky_announcements]` shortcode.
 - Supports one `%click%` placeholder per announcement.
 - Rotates valid announcements with lightweight vanilla JavaScript.
+- Supports GitHub release updates from the WordPress Plugins screen.
 
 ## Folder Structure
 

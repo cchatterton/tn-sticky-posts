@@ -17,6 +17,7 @@ final class Plugin
     private Admin_Actions $admin_actions;
     private Admin_Page $admin_page;
     private Shortcode $shortcode;
+    private GitHub_Updater $github_updater;
 
     public static function instance(): self
     {
@@ -36,6 +37,7 @@ final class Plugin
         $this->admin_actions = new Admin_Actions($this->validator);
         $this->admin_page = new Admin_Page($this->validator, $this->assets);
         $this->shortcode = new Shortcode($this->validator, $this->token_parser, $this->assets);
+        $this->github_updater = new GitHub_Updater();
     }
 
     public function init(): void
@@ -47,5 +49,6 @@ final class Plugin
         $this->admin_actions->init();
         $this->admin_page->init();
         $this->shortcode->init();
+        $this->github_updater->init();
     }
 }

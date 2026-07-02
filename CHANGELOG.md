@@ -1,6 +1,13 @@
 # Changelog
 
-All notable changes to Sticky Announcements are recorded here.
+All notable changes to TN Sticky Posts are recorded here.
+
+## 1.0.2 - 2026-07-02
+
+- Renamed the visible plugin row name to `TN Sticky Posts`.
+- Added `Plugin URI`, `Update URI`, and `Author URI` headers.
+- Added a GitHub release updater with `View details`, `GitHub`, and `Check for updates` plugin row support.
+- Added native WordPress update transient integration for GitHub releases.
 
 ## 1.0.1 - 2026-07-02
 

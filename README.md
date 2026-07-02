@@ -1,10 +1,10 @@
-# Sticky Announcements
+# TN Sticky Posts
 
 Techn WordPress plugin repository for `tn-sticky-posts`.
 
 ## Purpose
 
-Sticky Announcements extends native WordPress sticky posts with centrally managed announcement text, click labels, and click URLs.
+TN Sticky Posts extends native WordPress sticky posts with centrally managed announcement text, click labels, and click URLs.
 
 ## Key Features
 
@@ -14,6 +14,7 @@ Sticky Announcements extends native WordPress sticky posts with centrally manage
 - Registers `[sticky_announcements]` for frontend announcement output.
 - Supports plain announcements and one `%click%` CTA placeholder.
 - Loads frontend CSS and JavaScript only when the shortcode renders valid announcements.
+- Adds GitHub release update metadata and plugin-row update checks.
 
 ## Folder Structure
 
@@ -33,6 +34,5 @@ The plugin preserves the distinction between a native sticky post and an active 
 
 ## Future Considerations
 
-- GitHub release updater, if GitHub-based update delivery is required.
 - Gutenberg block support.
 - Announcement scheduling.
