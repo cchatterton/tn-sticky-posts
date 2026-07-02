@@ -2,6 +2,11 @@
 
 All notable changes to TN Sticky Posts are recorded here.
 
+## 1.0.3 - 2026-07-02
+
+- Changed the slide transition so the active announcement scrolls out upward and the next announcement scrolls in from the bottom.
+- Preserved reduced-motion behavior by showing only the active announcement without animation.
+
 ## 1.0.2 - 2026-07-02
 
 - Renamed the visible plugin row name to `TN Sticky Posts`.
