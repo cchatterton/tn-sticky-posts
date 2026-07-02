@@ -1,0 +1,52 @@
+.tnsp-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 1rem 0;
+}
+
+.tnsp-summary li {
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+}
+
+.tnsp-search {
+    margin: 1rem 0;
+}
+
+.tnsp-table .regular-text {
+    width: 100%;
+    max-width: 24rem;
+}
+
+.tnsp-actions form {
+    margin: 0 0 0.35rem;
+}
+
+.tnsp-status {
+    display: inline-block;
+    font-weight: 600;
+}
+
+.tnsp-status--active {
+    color: #008a20;
+}
+
+.tnsp-status--not_announced {
+    color: #646970;
+}
+
+.tnsp-status--needs_attention {
+    color: #b32d2e;
+}
+
+.tnsp-row-errors {
+    margin: 0.35rem 0 0;
+    color: #b32d2e;
+}
+
+.tnsp-author {
+    color: #646970;
+}
