@@ -46,10 +46,20 @@ final class Validator
         return esc_url_raw($url);
     }
 
-    public function validate_announcement(string $text, string $url, string $raw_text = ''): array
+    public function sanitize_label(string $label): string
+    {
+        $label = str_replace(array("\r", "\n", "\t"), ' ', wp_unslash($label));
+        $label = preg_replace('/\s+/', ' ', $label);
+        $label = wp_kses((string) $label, $this->allowed_html());
+
+        return trim($label);
+    }
+
+    public function validate_announcement(string $text, string $label, string $url, string $raw_text = ''): array
     {
         $errors = array();
         $sanitised_text = $this->sanitize_text($text);
+        $sanitised_label = $this->sanitize_label($label);
         $sanitised_url = $this->sanitize_url($url);
         $source_text = '' !== $raw_text ? wp_unslash($raw_text) : $text;
 
@@ -62,39 +72,30 @@ final class Validator
         }
 
         if ('' === $sanitised_text) {
-            if ('' !== $sanitised_url) {
+            if ('' !== $sanitised_label || '' !== $sanitised_url) {
                 $errors[] = 'url_without_token';
             }
 
-            return $this->result(empty($errors), $errors, $sanitised_text, $sanitised_url);
+            return $this->result(empty($errors), $errors, $sanitised_text, $sanitised_label, $sanitised_url);
         }
 
-        $open_count = substr_count($sanitised_text, '%click%');
-        $close_count = substr_count($sanitised_text, '%/click%');
+        $token_count = substr_count($sanitised_text, '%click%');
+        $legacy_close_count = substr_count($sanitised_text, '%/click%');
 
-        if (0 === $open_count && 0 === $close_count) {
-            if ('' !== $sanitised_url) {
+        if ($legacy_close_count > 0 || $token_count > 1) {
+            $errors[] = 'invalid_token_syntax';
+        }
+
+        if (0 === $token_count) {
+            if ('' !== $sanitised_label || '' !== $sanitised_url) {
                 $errors[] = 'url_without_token';
             }
 
-            return $this->result(empty($errors), $errors, $sanitised_text, $sanitised_url);
+            return $this->result(empty($errors), $errors, $sanitised_text, $sanitised_label, $sanitised_url);
         }
 
-        if (1 !== $open_count || 1 !== $close_count) {
-            $errors[] = 'invalid_token_syntax';
-        }
-
-        $open_pos = strpos($sanitised_text, '%click%');
-        $close_pos = strpos($sanitised_text, '%/click%');
-
-        if (false === $open_pos || false === $close_pos || $close_pos <= $open_pos) {
-            $errors[] = 'invalid_token_syntax';
-        } else {
-            $linked_text = substr($sanitised_text, $open_pos + strlen('%click%'), $close_pos - ($open_pos + strlen('%click%')));
-
-            if ('' === trim(wp_strip_all_tags($linked_text))) {
-                $errors[] = 'empty_link_text';
-            }
+        if ('' === trim(wp_strip_all_tags($sanitised_label))) {
+            $errors[] = 'empty_link_text';
         }
 
         if ('' === $sanitised_url) {
@@ -103,7 +104,7 @@ final class Validator
             $errors[] = 'invalid_url';
         }
 
-        return $this->result(empty(array_unique($errors)), array_values(array_unique($errors)), $sanitised_text, $sanitised_url);
+        return $this->result(empty(array_unique($errors)), array_values(array_unique($errors)), $sanitised_text, $sanitised_label, $sanitised_url);
     }
 
     public function is_valid_destination_url(string $url): bool
@@ -124,9 +125,9 @@ final class Validator
         $messages = array(
             'line_breaks_not_allowed' => __('Line breaks are not supported in announcement text.', 'tn-sticky-posts'),
             'unsupported_html'        => __('Unsupported HTML was entered.', 'tn-sticky-posts'),
-            'url_without_token'       => __('A destination URL requires a click token in the announcement text.', 'tn-sticky-posts'),
-            'invalid_token_syntax'    => __('The click token syntax is invalid. Use one %click%...%/click% pair.', 'tn-sticky-posts'),
-            'empty_link_text'         => __('The linked words inside the click token cannot be empty.', 'tn-sticky-posts'),
+            'url_without_token'       => __('A click label or destination URL requires a %click% token in the announcement text.', 'tn-sticky-posts'),
+            'invalid_token_syntax'    => __('The click token syntax is invalid. Use one %click% placeholder.', 'tn-sticky-posts'),
+            'empty_link_text'         => __('The click label cannot be empty when a click token is used.', 'tn-sticky-posts'),
             'missing_url'             => __('A destination URL is required when a click token is used.', 'tn-sticky-posts'),
             'invalid_url'             => __('The destination URL is invalid.', 'tn-sticky-posts'),
         );
@@ -136,13 +137,14 @@ final class Validator
         return $messages[$error] ?? __('The announcement could not be validated.', 'tn-sticky-posts');
     }
 
-    private function result(bool $valid, array $errors, string $text, string $url): array
+    private function result(bool $valid, array $errors, string $text, string $label, string $url): array
     {
         return array(
-            'valid'  => $valid,
-            'errors' => $errors,
-            'text'   => $text,
-            'url'    => $url,
+            'valid'       => $valid,
+            'errors'      => $errors,
+            'text'        => $text,
+            'click_label' => $label,
+            'url'         => $url,
         );
     }
 

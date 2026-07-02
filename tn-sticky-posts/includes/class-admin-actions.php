@@ -30,13 +30,15 @@ final class Admin_Actions
         $post = $this->validate_post_request($post_id);
 
         $raw_text = isset($_POST['tnsp_announcement_text']) ? (string) wp_unslash($_POST['tnsp_announcement_text']) : '';
+        $raw_label = isset($_POST['tnsp_click_label']) ? (string) wp_unslash($_POST['tnsp_click_label']) : '';
         $raw_url = isset($_POST['tnsp_announcement_url']) ? (string) wp_unslash($_POST['tnsp_announcement_url']) : '';
-        $validation = $this->validator->validate_announcement($raw_text, $raw_url, $raw_text);
+        $validation = $this->validator->validate_announcement($raw_text, $raw_label, $raw_url, $raw_text);
 
         update_post_meta($post->ID, Meta::TEXT_KEY, $validation['text']);
+        update_post_meta($post->ID, Meta::LABEL_KEY, $validation['click_label']);
         update_post_meta($post->ID, Meta::URL_KEY, $validation['url']);
 
-        do_action('sticky_announcements_saved', $post->ID, $validation['text'], $validation['url'], $validation);
+        do_action('sticky_announcements_saved', $post->ID, $validation['text'], $validation['click_label'], $validation['url'], $validation);
 
         if ($validation['valid']) {
             $this->redirect('saved');
@@ -52,6 +54,7 @@ final class Admin_Actions
         $post = $this->validate_post_request($post_id);
 
         delete_post_meta($post->ID, Meta::TEXT_KEY);
+        delete_post_meta($post->ID, Meta::LABEL_KEY);
         delete_post_meta($post->ID, Meta::URL_KEY);
 
         do_action('sticky_announcements_cleared', $post->ID);
@@ -97,6 +100,7 @@ final class Admin_Actions
 
             if ('clear' === $bulk_action) {
                 delete_post_meta($post_id, Meta::TEXT_KEY);
+                delete_post_meta($post_id, Meta::LABEL_KEY);
                 delete_post_meta($post_id, Meta::URL_KEY);
                 do_action('sticky_announcements_cleared', $post_id);
                 $changed++;

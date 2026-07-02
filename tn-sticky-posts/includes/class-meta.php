@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
 final class Meta
 {
     public const TEXT_KEY = '_sticky_announcement_text';
+    public const LABEL_KEY = '_sticky_announcement_click_label';
     public const URL_KEY = '_sticky_announcement_url';
 
     private Validator $validator;
@@ -44,6 +45,18 @@ final class Meta
                 'single'            => true,
                 'type'              => 'string',
                 'sanitize_callback' => array($this->validator, 'sanitize_url'),
+                'auth_callback'     => array($this, 'can_edit_meta'),
+                'show_in_rest'      => false,
+            )
+        );
+
+        register_post_meta(
+            'post',
+            self::LABEL_KEY,
+            array(
+                'single'            => true,
+                'type'              => 'string',
+                'sanitize_callback' => array($this->validator, 'sanitize_label'),
                 'auth_callback'     => array($this, 'can_edit_meta'),
                 'show_in_rest'      => false,
             )

@@ -17,4 +17,5 @@ if (!defined('TNSP_REMOVE_DATA_ON_UNINSTALL') || true !== TNSP_REMOVE_DATA_ON_UN
 global $wpdb;
 
 $wpdb->delete($wpdb->postmeta, array('meta_key' => '_sticky_announcement_text'), array('%s'));
+$wpdb->delete($wpdb->postmeta, array('meta_key' => '_sticky_announcement_click_label'), array('%s'));
 $wpdb->delete($wpdb->postmeta, array('meta_key' => '_sticky_announcement_url'), array('%s'));

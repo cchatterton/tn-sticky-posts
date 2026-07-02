@@ -163,7 +163,8 @@ final class Admin_Page
         echo '<th scope="col">' . esc_html__('Status', 'tn-sticky-posts') . '</th>';
         echo '<th scope="col">' . esc_html__('Post', 'tn-sticky-posts') . '</th>';
         echo '<th scope="col">' . esc_html__('Announcement', 'tn-sticky-posts') . '</th>';
-        echo '<th scope="col">' . esc_html__('Destination URL', 'tn-sticky-posts') . '</th>';
+        echo '<th scope="col">' . esc_html__('Click label', 'tn-sticky-posts') . '</th>';
+        echo '<th scope="col">' . esc_html__('Click URL', 'tn-sticky-posts') . '</th>';
         echo '<th scope="col">' . esc_html__('Post status', 'tn-sticky-posts') . '</th>';
         echo '<th scope="col">' . esc_html__('Last modified', 'tn-sticky-posts') . '</th>';
         echo '<th scope="col">' . esc_html__('Actions', 'tn-sticky-posts') . '</th>';
@@ -179,6 +180,7 @@ final class Admin_Page
     private function render_row(\WP_Post $post): void
     {
         $text = (string) get_post_meta($post->ID, Meta::TEXT_KEY, true);
+        $label = (string) get_post_meta($post->ID, Meta::LABEL_KEY, true);
         $url = (string) get_post_meta($post->ID, Meta::URL_KEY, true);
         $status = $this->row_status($post);
         $save_form = 'tnsp-save-' . $post->ID;
@@ -200,8 +202,10 @@ final class Admin_Page
         echo '</td>';
         echo '<td>' . $this->post_column($post) . '</td>';
         echo '<td><label class="screen-reader-text" for="tnsp-text-' . esc_attr((string) $post->ID) . '">' . esc_html__('Announcement', 'tn-sticky-posts') . '</label>';
-        echo '<input id="tnsp-text-' . esc_attr((string) $post->ID) . '" class="regular-text tnsp-announcement-input" type="text" name="tnsp_announcement_text" value="' . esc_attr($text) . '" placeholder="' . esc_attr__('Registrations are open for our %click%annual conference%/click%.', 'tn-sticky-posts') . '" form="' . esc_attr($save_form) . '"></td>';
-        echo '<td><label class="screen-reader-text" for="tnsp-url-' . esc_attr((string) $post->ID) . '">' . esc_html__('Destination URL', 'tn-sticky-posts') . '</label>';
+        echo '<input id="tnsp-text-' . esc_attr((string) $post->ID) . '" class="regular-text tnsp-announcement-input" type="text" name="tnsp_announcement_text" value="' . esc_attr($text) . '" placeholder="' . esc_attr__('Registrations are open for our %click%.', 'tn-sticky-posts') . '" form="' . esc_attr($save_form) . '"></td>';
+        echo '<td><label class="screen-reader-text" for="tnsp-label-' . esc_attr((string) $post->ID) . '">' . esc_html__('Click label', 'tn-sticky-posts') . '</label>';
+        echo '<input id="tnsp-label-' . esc_attr((string) $post->ID) . '" class="regular-text" type="text" name="tnsp_click_label" value="' . esc_attr($label) . '" placeholder="' . esc_attr__('annual conference', 'tn-sticky-posts') . '" form="' . esc_attr($save_form) . '"></td>';
+        echo '<td><label class="screen-reader-text" for="tnsp-url-' . esc_attr((string) $post->ID) . '">' . esc_html__('Click URL', 'tn-sticky-posts') . '</label>';
         echo '<input id="tnsp-url-' . esc_attr((string) $post->ID) . '" class="regular-text" type="text" inputmode="url" name="tnsp_announcement_url" value="' . esc_attr($url) . '" placeholder="' . esc_attr__('https://example.com/event/', 'tn-sticky-posts') . '" form="' . esc_attr($save_form) . '"></td>';
         $post_status = get_post_status_object($post->post_status);
         echo '<td>' . esc_html($post_status ? $post_status->label : $post->post_status) . '</td>';
@@ -250,10 +254,11 @@ final class Admin_Page
     private function row_status(\WP_Post $post): array
     {
         $text = (string) get_post_meta($post->ID, Meta::TEXT_KEY, true);
+        $label = (string) get_post_meta($post->ID, Meta::LABEL_KEY, true);
         $url = (string) get_post_meta($post->ID, Meta::URL_KEY, true);
-        $validation = $this->validator->validate_announcement($text, $url);
+        $validation = $this->validator->validate_announcement($text, $label, $url);
 
-        if ('' === trim(wp_strip_all_tags($text)) && '' === $url) {
+        if ('' === trim(wp_strip_all_tags($text)) && '' === $label && '' === $url) {
             return array(
                 'key'      => 'not_announced',
                 'label'    => __('Not announced', 'tn-sticky-posts'),

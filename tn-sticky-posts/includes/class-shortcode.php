@@ -151,14 +151,15 @@ final class Shortcode
             }
 
             $text = (string) get_post_meta($post->ID, Meta::TEXT_KEY, true);
+            $label = (string) get_post_meta($post->ID, Meta::LABEL_KEY, true);
             $url = (string) get_post_meta($post->ID, Meta::URL_KEY, true);
-            $validation = $this->validator->validate_announcement($text, $url);
+            $validation = $this->validator->validate_announcement($text, $label, $url);
 
             if (!$validation['valid'] || '' === $validation['text']) {
                 continue;
             }
 
-            $rendered = $this->token_parser->render_announcement_text($validation['text'], $validation['url'], $link_attributes);
+            $rendered = $this->token_parser->render_announcement_text($validation['text'], $validation['click_label'], $validation['url'], $link_attributes);
 
             if ('' !== $rendered) {
                 $items[] = $rendered;

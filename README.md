@@ -4,15 +4,15 @@ Techn WordPress plugin repository for `tn-sticky-posts`.
 
 ## Purpose
 
-Sticky Announcements extends native WordPress sticky posts with centrally managed announcement text and an optional click-token destination URL.
+Sticky Announcements extends native WordPress sticky posts with centrally managed announcement text, click labels, and click URLs.
 
 ## Key Features
 
 - Adds Posts -> Sticky in WordPress admin.
 - Lists standard posts currently marked sticky using WordPress native sticky-post storage.
-- Lets editors save, clear, or remove sticky announcements from one screen.
+- Lets editors save announcement text, click labels, click URLs, clear announcements, or remove sticky flags from one screen.
 - Registers `[sticky_announcements]` for frontend announcement output.
-- Supports plain announcements and one `%click%...%/click%` CTA token.
+- Supports plain announcements and one `%click%` CTA placeholder.
 - Loads frontend CSS and JavaScript only when the shortcode renders valid announcements.
 
 ## Folder Structure
@@ -29,7 +29,7 @@ tn-sticky-posts/
 
 ## Important Notes
 
-The plugin preserves the distinction between a native sticky post and an active sticky announcement. Sticky posts appear on the admin screen immediately, but only valid configured announcements appear in shortcode output.
+The plugin preserves the distinction between a native sticky post and an active sticky announcement. Sticky posts appear on the admin screen immediately, but only valid configured announcements appear in shortcode output. When an announcement contains `%click%`, the separate click label and click URL fields are used to generate the frontend link.
 
 ## Future Considerations
 
