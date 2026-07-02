@@ -2,6 +2,11 @@
 
 All notable changes to TN Sticky Posts are recorded here.
 
+## 1.0.4 - 2026-07-02
+
+- Hardened the plugin-row manual update check so it directly refreshes WordPress update data.
+- Added visible admin notices for successful checks, no-update results, and failed GitHub lookups.
+
 ## 1.0.3 - 2026-07-02
 
 - Changed the slide transition so the active announcement scrolls out upward and the next announcement scrolls in from the bottom.

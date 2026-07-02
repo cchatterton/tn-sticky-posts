@@ -3,7 +3,7 @@
  * Plugin Name: TN Sticky Posts
  * Plugin URI: https://github.com/cchatterton/tn-sticky-posts/releases/latest
  * Description: Centrally manages announcement content for native WordPress sticky posts.
- * Version: 1.0.3
+ * Version: 1.0.4
  * Requires at least: 6.0
  * Requires PHP: 8.1
  * Update URI: https://github.com/cchatterton/tn-sticky-posts
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('TNSP_VERSION', '1.0.3');
+define('TNSP_VERSION', '1.0.4');
 define('TNSP_PLUGIN_FILE', __FILE__);
 define('TNSP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('TNSP_PLUGIN_URL', plugin_dir_url(__FILE__));

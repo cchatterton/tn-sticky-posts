@@ -26,6 +26,8 @@ final class GitHub_Updater
         add_filter('plugins_api', array($this, 'plugin_details'), 10, 3);
         add_filter('plugin_row_meta', array($this, 'row_meta'), 10, 2);
         add_action('admin_init', array($this, 'handle_manual_update_check'));
+        add_action('admin_notices', array($this, 'manual_update_check_notice'));
+        add_action('network_admin_notices', array($this, 'manual_update_check_notice'));
         add_action('upgrader_process_complete', array($this, 'clear_cache_after_upgrade'), 10, 2);
     }
 
@@ -126,10 +128,58 @@ final class GitHub_Updater
             require_once ABSPATH . 'wp-includes/update.php';
         }
 
+        if (function_exists('wp_clean_plugins_cache')) {
+            wp_clean_plugins_cache(true);
+        }
+
+        $_GET['force-check'] = '1';
         wp_update_plugins();
 
-        wp_safe_redirect(add_query_arg('tnsp_checked_updates', '1', $this->plugins_page_url()));
+        $transient = get_site_transient('update_plugins');
+        $transient = $this->add_update_data(is_object($transient) ? $transient : new \stdClass());
+        set_site_transient('update_plugins', $transient);
+
+        $notice = isset($transient->response[TNSP_PLUGIN_BASENAME]) ? 'update_available' : 'no_update';
+        if (get_site_transient(self::ERROR_TRANSIENT)) {
+            $notice = 'lookup_failed';
+        }
+
+        wp_safe_redirect(add_query_arg('tnsp_checked_updates', $notice, $this->plugins_page_url()));
         exit;
+    }
+
+    public function manual_update_check_notice(): void
+    {
+        $notice = isset($_GET['tnsp_checked_updates']) ? sanitize_key((string) wp_unslash($_GET['tnsp_checked_updates'])) : '';
+
+        if ('' === $notice) {
+            return;
+        }
+
+        if ('update_available' === $notice) {
+            echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('TN Sticky Posts update check completed. A newer version is available below.', 'tn-sticky-posts') . '</p></div>';
+            return;
+        }
+
+        if ('lookup_failed' === $notice) {
+            $message = __('TN Sticky Posts could not read the latest GitHub release. The site may be blocked from reaching GitHub or rate limited.', 'tn-sticky-posts');
+            $error = get_site_transient(self::ERROR_TRANSIENT);
+
+            if (is_array($error) && !empty($error['message'])) {
+                $message .= ' ' . sprintf(
+                    /* translators: %s: GitHub lookup error message. */
+                    __('GitHub returned: %s', 'tn-sticky-posts'),
+                    (string) $error['message']
+                );
+            }
+
+            echo '<div class="notice notice-error is-dismissible"><p>' . esc_html($message) . '</p></div>';
+            return;
+        }
+
+        if ('no_update' === $notice) {
+            echo '<div class="notice notice-info is-dismissible"><p>' . esc_html__('TN Sticky Posts update check completed. No newer GitHub release was found.', 'tn-sticky-posts') . '</p></div>';
+        }
     }
 
     public function clear_cache_after_upgrade($upgrader, array $hook_extra): void
