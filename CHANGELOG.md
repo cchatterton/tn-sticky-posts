@@ -2,6 +2,11 @@
 
 All notable changes to TN Sticky Posts are recorded here.
 
+## 1.0.6 - 2026-07-02
+
+- Added a GitHub release redirect fallback when the GitHub API returns forbidden or rate-limited responses.
+- Verifies the expected release ZIP URL before offering fallback update data.
+
 ## 1.0.5 - 2026-07-02
 
 - Fixed slide initialization so announcements remain visible while JavaScript measures the active item height.

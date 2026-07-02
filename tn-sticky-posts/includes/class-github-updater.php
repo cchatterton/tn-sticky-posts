@@ -217,6 +217,11 @@ final class GitHub_Updater
         );
 
         if (is_wp_error($response)) {
+            $fallback_release = $this->latest_release_from_redirect('wp_error', $response->get_error_message());
+            if ($fallback_release) {
+                return $fallback_release;
+            }
+
             set_site_transient(
                 self::ERROR_TRANSIENT,
                 array(
@@ -234,6 +239,11 @@ final class GitHub_Updater
         $body = wp_remote_retrieve_body($response);
 
         if ($code < 200 || $code >= 300) {
+            $fallback_release = $this->latest_release_from_redirect('http_error', wp_remote_retrieve_response_message($response), $code, substr($body, 0, 500));
+            if ($fallback_release) {
+                return $fallback_release;
+            }
+
             set_site_transient(
                 self::ERROR_TRANSIENT,
                 array(
@@ -268,6 +278,127 @@ final class GitHub_Updater
         delete_site_transient(self::ERROR_TRANSIENT);
 
         return $release;
+    }
+
+    private function latest_release_from_redirect(string $error_type, string $error_message = '', int $error_code = 0, string $error_body = ''): ?array
+    {
+        $response = wp_remote_get(
+            $this->repo_url() . '/releases/latest',
+            array(
+                'redirection' => 0,
+                'timeout'     => 10,
+                'headers'     => array(
+                    'User-Agent' => 'TN-Sticky-Posts/' . TNSP_VERSION,
+                ),
+            )
+        );
+
+        if (is_wp_error($response)) {
+            $this->store_lookup_error($error_type, $error_message, $error_code, $error_body);
+            return null;
+        }
+
+        $location = (string) wp_remote_retrieve_header($response, 'location');
+        if ('' === $location || !preg_match('#/releases/tag/(v?[0-9][A-Za-z0-9._-]*)#', $location, $matches)) {
+            $this->store_lookup_error($error_type, $error_message, $error_code, $error_body);
+            return null;
+        }
+
+        $tag = sanitize_text_field(rawurldecode($matches[1]));
+        $version = ltrim($tag, 'vV');
+        if ('' === $version) {
+            $this->store_lookup_error($error_type, $error_message, $error_code, $error_body);
+            return null;
+        }
+
+        $package = $this->repo_url() . '/releases/download/' . rawurlencode($tag) . '/' . self::ASSET_NAME;
+        if (!$this->release_asset_is_reachable($package)) {
+            $this->store_lookup_error('asset_missing', __('The latest GitHub release did not expose the expected ZIP asset.', 'tn-sticky-posts'), 0, $package);
+            return null;
+        }
+
+        $release = array(
+            'tag_name' => $tag,
+            'html_url' => $this->repo_url() . '/releases/tag/' . rawurlencode($tag),
+            'body'     => '',
+            'assets'   => array(
+                array(
+                    'name'                 => self::ASSET_NAME,
+                    'browser_download_url' => $package,
+                ),
+            ),
+        );
+
+        $cache_length = version_compare($version, TNSP_VERSION, '>') ? 6 * HOUR_IN_SECONDS : 5 * MINUTE_IN_SECONDS;
+        set_site_transient(self::RELEASE_TRANSIENT, $release, $cache_length);
+        delete_site_transient(self::ERROR_TRANSIENT);
+
+        return $release;
+    }
+
+    private function release_asset_is_reachable(string $package): bool
+    {
+        $response = wp_remote_head(
+            $package,
+            array(
+                'redirection' => 5,
+                'timeout'     => 10,
+                'headers'     => array(
+                    'User-Agent' => 'TN-Sticky-Posts/' . TNSP_VERSION,
+                ),
+            )
+        );
+
+        if (is_wp_error($response)) {
+            return $this->release_asset_get_is_reachable($package);
+        }
+
+        $code = (int) wp_remote_retrieve_response_code($response);
+
+        if ($code >= 200 && $code < 400) {
+            return true;
+        }
+
+        return $this->release_asset_get_is_reachable($package);
+    }
+
+    private function release_asset_get_is_reachable(string $package): bool
+    {
+        $response = wp_remote_get(
+            $package,
+            array(
+                'redirection'         => 5,
+                'timeout'             => 10,
+                'limit_response_size' => 1,
+                'headers'             => array(
+                    'User-Agent' => 'TN-Sticky-Posts/' . TNSP_VERSION,
+                ),
+            )
+        );
+
+        if (is_wp_error($response)) {
+            return false;
+        }
+
+        $code = (int) wp_remote_retrieve_response_code($response);
+
+        return $code >= 200 && $code < 400;
+    }
+
+    private function store_lookup_error(string $type, string $message = '', int $code = 0, string $body = ''): void
+    {
+        set_site_transient(
+            self::ERROR_TRANSIENT,
+            array(
+                'type'       => $type,
+                'code'       => $code,
+                'message'    => $message,
+                'body'       => substr($body, 0, 500),
+                'checked_at' => time(),
+            ),
+            10 * MINUTE_IN_SECONDS
+        );
+        delete_site_transient(self::RELEASE_TRANSIENT);
     }
 
     private function release_version(array $release): string
