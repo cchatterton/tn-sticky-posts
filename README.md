@@ -36,3 +36,7 @@ The plugin preserves the distinction between a native sticky post and an active 
 
 - Gutenberg block support.
 - Announcement scheduling.
+
+## Controller integration — 1.0.7
+
+Remove independent GitHub update checks and delegate updates to Techn Update Controller. Keep Beta readiness and existing feature settings, package identity and domain restrictions. Previous standalone GitHub update instructions are superseded.

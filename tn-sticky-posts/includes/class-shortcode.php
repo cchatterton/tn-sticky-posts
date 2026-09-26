@@ -24,7 +24,7 @@ final class Shortcode
         add_shortcode('sticky_announcements', array($this, 'render'));
     }
 
-    public function render(array|string $atts = array()): string
+    public function render($atts = array()): string
     {
         $atts = shortcode_atts(
             apply_filters(

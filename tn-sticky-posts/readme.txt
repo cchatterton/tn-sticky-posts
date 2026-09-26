@@ -1,4 +1,6 @@
 # TN Sticky Posts
+Tags: techn
+Contributors:
 
 Author: Techn
 Version: 1.0.6
@@ -38,3 +40,10 @@ A post appears in shortcode output only when it is published, sticky, has non-em
 - Scheduling.
 - Multiple CTA links.
 - Custom post type support.
+
+== Managed updates ==
+
+Install or activate Techn Update Controller using the plugin row action. Update discovery is manual or scheduled by the controller; ordinary page rendering never checks GitHub. Feature operation does not require the controller. This release remains Beta. Earlier standalone updater instructions are superseded. Explicit controller installation downloads the official GitHub release; no feature settings or site inventory are sent. GitHub receives normal request metadata.
+
+Service terms: https://docs.github.com/en/site-policy/github-terms/github-terms-of-service
+Privacy: https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement

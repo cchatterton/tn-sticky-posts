@@ -2,6 +2,13 @@
 
 All notable changes to TN Sticky Posts are recorded here.
 
+## 1.0.7 - 2026-09-26
+
+- Align WordPress 7.0 / PHP 7.4 metadata, GPL/readme packaging and project-authored CSS units with current Codex standards.
+- Remove PHP 8-only shortcode argument declaration while preserving the accepted WordPress shortcode inputs.
+- Remove independent GitHub update checks and delegate updates to Techn Update Controller. Keep Beta readiness and existing feature settings, package identity and domain restrictions.
+- Standardise update headers and controller-aware Install/Activate/Check links.
+
 ## 1.0.6 - 2026-07-02
 
 - Added a GitHub release redirect fallback when the GitHub API returns forbidden or rate-limited responses.
